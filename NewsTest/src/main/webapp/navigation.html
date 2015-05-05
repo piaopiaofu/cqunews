@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Navigation page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.css" />
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+<script src="js/purl.js"></script>
+<script type="text/javascript">
+	//默认栏目为48（重大教学）
+	localStorage.categoryId ="48";
+	//默认新闻为空
+	localStorage.newsId="";
+	localStorage.impnewsId="";
+	//此处定义一个函数，用于刷新新闻列表
+	function reloadNewsList()
+	{
+		//查询id=newsList的元素清空（清空新闻列表）
+		$("#newsList").empty();
+		//发生ajax到findNewsByCategory.do查询新闻列表
+		$.ajax({
+			url : "findlistimpnews.do",
+			//请求成功后的回调函数
+			success : function(result) {
+				//生成新闻列表
+				for (i = 0; i < result.length; i++) {
+					var impnews = result[i];
+					//点击链接转到相应的地点
+					var link=$('<a  id="impnewsid_'+impnews.id+'" ><h3 style="white-space:pre-wrap;">'
+							+ impnews.title
+							+ '</h3></a>');
+					//为每个新闻链接添加点击事件
+					link.on("click",function(){
+					localStorage.impnewsId=	$(this).attr("id").substring(10);
+					window.location.href="ImpNewinfo.html";
+				})
+					//添加新闻链接到列表
+					var li = $('<li></li>');
+					li.append(link);
+					$("#newsList").append(li);
+				}
+				//刷新id=newsList的元素（刷新新闻列表）
+				$("#newsList").listview('refresh');
+				}
+			});
+	}
+	
+	//page1初始化
+	$(document).on("pageinit","#page1",function(){
+		reloadNewsList();
+		$(".menu").on("click",function() {
+			localStorage.categoryId = $(this).attr("id").substring(9);
+			window.location.href="News.html";
+		})
+	});
+</script>
+</head>
+<body>
+<!--该页用于显示导航和重要新闻 -->
+	<div data-role="page"  data-dom-cache="true" id="page1">
+		<div data-role="header">
+			<h1>重大新闻网</h1>
+			<div data-role="navbar" id="navbar">
+				<ul id="navbar_ul">
+					<li><a id="category_48" class="menu" href="#" data-icon="arrow-r">重大教学</a></li>
+					<li><a id="category_47" class="menu" href="#" data-icon="arrow-r">重大学术</a></li>
+					<li><a id="category_46" class="menu" href="#" data-icon="arrow-r">重大科研</a></li>
+					<li><a id="category_53" class="menu" href="#" data-icon="arrow-r">招生就业</a></li>
+				</ul>
+			</div>
+		</div>
+		<div data-role="importantnews" class="ui-content">
+		<h2 align="center">新闻快递</h2>
+			<ul id="newsList" data-role="listview" data-inset="true">
+				
+			</ul>
+		</div>
+	</div>
+</body>
+</html>

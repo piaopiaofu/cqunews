@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>News page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.css" />
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+<script src="js/purl.js"></script>
+<script type="text/javascript">
+//page2显示前
+$(document).on("pagebeforeshow","#page2",function(){
+	//清空页面
+	$("#newsList").empty();
+	//加载新闻
+	$.ajax({
+		url : "findNewsByCategory.do",
+		//请求的参数，即findNewsByCategory.do?categoryId= localStorage.categoryId
+		data : {
+			categoryId : localStorage.categoryId
+			},
+		//请求成功后的回调函数
+		success : function(result) {
+			//生成新闻列表
+			for (i = 0; i < result.length; i++) {
+				var news = result[i];
+				//点击链接转到Newinfo.html
+				var link=$('<a  id="newsid_'+news.id+'"><img height="80" src="'+news.img+'"></img><h3 style="white-space:pre-wrap;">'
+							+ news.title
+							+ '</h3></a>');
+				//为每个新闻链接添加点击事件
+				link.on("click",function(){
+					localStorage.newsId=$(this).attr("id").substring(7);
+					window.location.href="Newinfo.html";
+				})
+				//添加新闻链接到列表
+				var li = $('<li></li>');
+				li.append(link);
+				$("#newsList").append(li);
+			}
+			//刷新id=newsList的元素（刷新新闻列表）
+			$("#newsList").listview('refresh');
+			}
+		});
+});
+	
+</script>
+</head>
+<body>
+	<div data-role="page"  data-dom-cache="false" id="page2">
+	<div data-role="header">
+			<a href="#" data-rel="back" data-role="button">返回</a>
+		</div>
+		<div role="main" class="ui-content" >
+			<ul id="newsList" data-role="listview" data-inset="true">
+				
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
